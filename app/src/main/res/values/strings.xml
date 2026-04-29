@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">TuniWander</string>
+    <string name="tourist_guide_tunisia">Tourist Guide Tunisia 🇹🇳</string>
+    <string name="discover_the_magic_of_tunisia">Discover the magic of Tunisia</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    <string name="start_exploring">Start Exploring →</string>
+    <string name="from_the_sahara_dunes_to_the_mediterranean_sea_explore_the_most_beautiful_destinations_tunisia_has_to_offer">From the Sahara dunes to the Mediterranean sea, explore the most beautiful destinations Tunisia has to offer.</string>
+</resources>
