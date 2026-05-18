@@ -13,18 +13,25 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SignInActivity extends AppCompatActivity {
 
+    private TextInputEditText etEmail, etPassword;
     private Button btnSignIn;
     private TextView ForgotPassword, Register;
-    private TextInputEditText etEmail, etPassword;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_sign_in);
+
+        mAuth = FirebaseAuth.getInstance();
+        db    = FirebaseFirestore.getInstance();
 
         btnSignIn      = findViewById(R.id.btnSignIn);
         ForgotPassword = findViewById(R.id.ForgotPassword);
@@ -33,39 +40,69 @@ public class SignInActivity extends AppCompatActivity {
         etPassword     = findViewById(R.id.Password);
 
         btnSignIn.setOnClickListener(v -> {
-            String email    = etEmail.getText().toString().trim();
-            String password = etPassword.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String pass  = etPassword.getText().toString().trim();
 
-            if (email.isEmpty()) {
-                etEmail.setError("Please enter your email");
-                return;
-            }
-            if (password.isEmpty()) {
-                etPassword.setError("Please enter your password");
-                return;
-            }
+            if (email.isEmpty()) { etEmail.setError("Enter your email");    return; }
+            if (pass.isEmpty())  { etPassword.setError("Enter a password"); return; }
 
-            // Firebase later → direct navigation for now
-            Toast.makeText(this, "Welcome back! ✅", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(SignInActivity.this, ListeLieuxActivity.class);
-            startActivity(intent);
-            finish();
+            mAuth.signInWithEmailAndPassword(email, pass)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            String uid = mAuth.getCurrentUser().getUid();
+                            // Lire le role depuis Firestore puis rediriger
+                            db.collection("users").document(uid).get()
+                                    .addOnSuccessListener(doc -> {
+                                        String role = doc.getString("role");
+                                        if (role == null) role = "Touriste";
+                                        Toast.makeText(this,
+                                                "Welcome back! ✅", Toast.LENGTH_SHORT).show();
+                                        redirectByRole(role);
+                                    });
+                        } else {
+                            Toast.makeText(this,
+                                    "Error: " + task.getException().getMessage(),
+                                    Toast.LENGTH_LONG).show();
+                        }
+                    });
         });
 
-        ForgotPassword.setOnClickListener(v -> {
-            Intent intent = new Intent(SignInActivity.this, ForgotPasswordActivity.class);
-            startActivity(intent);
-        });
+        ForgotPassword.setOnClickListener(v ->
+                startActivity(new Intent(this, ForgotPasswordActivity.class)));
 
-        Register.setOnClickListener(v -> {
-            Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
-            startActivity(intent);
-        });
+        Register.setOnClickListener(v ->
+                startActivity(new Intent(this, SignUpActivity.class)));
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void redirectByRole(String role) {
+        Intent intent;
+        switch (role) {
+            case "Admin":  intent = new Intent(this, AdminDashboardActivity.class); break;
+            case "Guide":  intent = new Intent(this, ListeLieuxActivity.class);     break;
+            case "Agence": intent = new Intent(this, ListeLieuxActivity.class);     break;
+            default:       intent = new Intent(this, ListeLieuxActivity.class);     break;
+        }
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mAuth.getCurrentUser() != null) {
+            String uid = mAuth.getCurrentUser().getUid();
+            db.collection("users").document(uid).get()
+                    .addOnSuccessListener(doc -> {
+                        String role = doc.getString("role");
+                        if (role == null) role = "Touriste";
+                        redirectByRole(role);
+                    });
+        }
     }
 }

@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.example.miniprojet" />
-                  <option name="mobileSdkAppId" value="1:770177114239:android:af967d5be4923181139f4a" />
-                  <option name="projectId" value="tourist-guide-tunisia" />
-                  <option name="projectNumber" value="770177114239" />
+                  <option name="mobileSdkAppId" value="1:993256549914:android:2cbfa1fc9596cda58f2ba3" />
+                  <option name="projectId" value="tuniwander" />
+                  <option name="projectNumber" value="993256549914" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

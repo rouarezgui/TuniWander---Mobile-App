@@ -12,14 +12,17 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class LieuAdapter extends RecyclerView.Adapter<LieuAdapter.LieuViewHolder> {
 
-    private Context context;
-    private List<Lieu> lieuList;
+    private final Context context;
+    private final List<Lieu> lieuList;
 
-    // Constructor
     public LieuAdapter(Context context, List<Lieu> lieuList) {
         this.context  = context;
         this.lieuList = lieuList;
@@ -28,7 +31,6 @@ public class LieuAdapter extends RecyclerView.Adapter<LieuAdapter.LieuViewHolder
     @NonNull
     @Override
     public LieuViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate item_lieu.xml
         View view = LayoutInflater.from(context)
                 .inflate(R.layout.item_lieu, parent, false);
         return new LieuViewHolder(view);
@@ -38,40 +40,28 @@ public class LieuAdapter extends RecyclerView.Adapter<LieuAdapter.LieuViewHolder
     public void onBindViewHolder(@NonNull LieuViewHolder holder, int position) {
         Lieu lieu = lieuList.get(position);
 
-        // Set text data
         holder.tvNom.setText(lieu.getNom());
         holder.tvVille.setText(lieu.getVille());
         holder.tvDescription.setText(lieu.getDescription());
         holder.tvCategorie.setText(lieu.getCategorie());
 
-        // Load image — local drawable
-        if (lieu.getImageUrl() != null && !lieu.getImageUrl().isEmpty()) {
-
-            if (lieu.getImageUrl().startsWith("http")) {
-                // Internet URL → not used for now
-                holder.imgLieu.setImageResource(R.drawable.beach);
-            } else {
-                // Local drawable name → getIdentifier
-                int resId = context.getResources().getIdentifier(
-                        lieu.getImageUrl(),
-                        "drawable",
-                        context.getPackageName()
-                );
-                if (resId != 0) {
-                    // Found → set image
-                    holder.imgLieu.setImageResource(resId);
-                } else {
-                    // Not found → default image
-                    holder.imgLieu.setImageResource(R.drawable.beach);
-                }
-            }
-
+        // Load image via Glide (URL) ou drawable local
+        String imageUrl = lieu.getImageUrl();
+        if (imageUrl != null && imageUrl.startsWith("http")) {
+            Glide.with(context)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.beach)
+                    .error(R.drawable.beach)
+                    .centerCrop()
+                    .into(holder.imgLieu);
         } else {
-            // Empty URL → default image
-            holder.imgLieu.setImageResource(R.drawable.beach);
+            int resId = context.getResources().getIdentifier(
+                    imageUrl, "drawable", context.getPackageName()
+            );
+            holder.imgLieu.setImageResource(resId != 0 ? resId : R.drawable.beach);
         }
 
-        // Click on card or Explore button → DetailActivity
+        // Click → DetailActivity avec programme
         View.OnClickListener goToDetail = v -> {
             Intent intent = new Intent(context, DetailActivity.class);
             intent.putExtra("nom",         lieu.getNom());
@@ -79,6 +69,19 @@ public class LieuAdapter extends RecyclerView.Adapter<LieuAdapter.LieuViewHolder
             intent.putExtra("description", lieu.getDescription());
             intent.putExtra("imageUrl",    lieu.getImageUrl());
             intent.putExtra("categorie",   lieu.getCategorie());
+
+            // Passer programme comme ArrayList<String> "heure|activite"
+            ArrayList<String> programmeList = new ArrayList<>();
+            if (lieu.getProgramme() != null) {
+                for (Map<String, String> step : lieu.getProgramme()) {
+                    String heure    = step.get("heure");
+                    String activite = step.get("activite");
+                    if (heure != null && activite != null) {
+                        programmeList.add(heure + "|" + activite);
+                    }
+                }
+            }
+            intent.putStringArrayListExtra("programme", programmeList);
             context.startActivity(intent);
         };
 
@@ -91,12 +94,12 @@ public class LieuAdapter extends RecyclerView.Adapter<LieuAdapter.LieuViewHolder
         return lieuList.size();
     }
 
-    // ViewHolder
+    // ─── ViewHolder ───────────────────────────────────────────────
     public static class LieuViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imgLieu;
-        TextView tvNom, tvVille, tvDescription, tvCategorie;
-        Button btnExplore;
+        TextView  tvNom, tvVille, tvDescription, tvCategorie;
+        Button    btnExplore;
 
         public LieuViewHolder(@NonNull View itemView) {
             super(itemView);

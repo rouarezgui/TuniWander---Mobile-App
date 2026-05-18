@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_marginBottom="10dp">
+
+    <!-- Gold time badge -->
+    <TextView
+        android:id="@+id/tvHeure"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:background="#FFD700"
+        android:gravity="center"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:textColor="#000000"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Vertical gold line -->
+    <View
+        android:layout_width="2dp"
+        android:layout_height="36dp"
+        android:background="#44FFD700"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Activity text -->
+    <TextView
+        android:id="@+id/tvActivite"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="#CCFFFFFF"
+        android:textSize="13sp"
+        android:lineSpacingExtra="2dp" />
+
+</LinearLayout>

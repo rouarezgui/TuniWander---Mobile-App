@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "770177114239",
-    "project_id": "tourist-guide-tunisia",
-    "storage_bucket": "tourist-guide-tunisia.firebasestorage.app"
+    "project_number": "993256549914",
+    "project_id": "tuniwander",
+    "storage_bucket": "tuniwander.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:770177114239:android:af967d5be4923181139f4a",
+        "mobilesdk_app_id": "1:993256549914:android:2cbfa1fc9596cda58f2ba3",
         "android_client_info": {
           "package_name": "com.example.miniprojet"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDA8yc6ZAbiroQ4E1wnFnAkDV330qFsAR4"
+          "current_key": "AIzaSyDmer-4sYB3ItlVICgsKUJP4rxO1Rl5OSQ"
         }
       ],
       "services": {

@@ -12,7 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MiniProjet">
 
-        <!-- SplashActivity → FIRST to open ✅ -->
         <activity
             android:name=".SplashActivity"
             android:exported="true"
@@ -24,31 +23,24 @@
             </intent-filter>
         </activity>
 
-        <!-- MainActivity → no intent-filter anymore -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".SignInActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".SignUpActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".ForgotPasswordActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".ListeLieuxActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".DetailActivity"
-            android:exported="false"
-            tools:ignore="Instantiatable" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".SignInActivity" android:exported="false" />
+        <activity android:name=".SignUpActivity" android:exported="false" />
+        <activity android:name=".ForgotPasswordActivity" android:exported="false" />
+        <activity android:name=".ListeLieuxActivity" android:exported="false" />
+        <activity android:name=".DetailActivity" android:exported="false" />
+        <activity android:name=".ReservationActivity" android:exported="false" />
+        <activity android:name=".ProfilActivity" android:exported="false" />
+        <activity android:name=".TouristeProfilActivity" android:exported="false" />
+        <activity android:name=".GuideProfilActivity" android:exported="false" />
+        <activity android:name=".AgenceProfilActivity" android:exported="false" />
+        <activity android:name=".AdminDashboardActivity" android:exported="false" />
+        <activity android:name=".RatingActivity" android:exported="false" />
+        <activity android:name=".AddEditLieuActivity" android:exported="false" />
+        <activity android:name=".ManageLieuxActivity" android:exported="false" />
+        <activity android:name=".ManageUsersActivity" android:exported="false" />
+        <activity android:name=".ManageReservationsActivity" android:exported="false" />
+        <activity android:name=".SendNotificationActivity" android:exported="false" />
 
     </application>
 
