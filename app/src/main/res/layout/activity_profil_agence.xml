@@ -104,14 +104,6 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Gold divider -->
-            <View
-                android:layout_width="60dp"
-                android:layout_height="2dp"
-                android:background="#FFD700"
-                android:layout_gravity="center"
-                android:layout_marginBottom="24dp" />
-
             <!-- Stats -->
             <LinearLayout
                 android:layout_width="match_parent"
@@ -138,7 +130,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Lieux"
+                        android:text="Destinations"
                         android:textColor="#CCFFFFFF"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -161,48 +153,58 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Guides"
+                        android:text="Our Guides"
                         android:textColor="#CCFFFFFF"
                         android:textSize="11sp" />
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Actions agence -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="⚙️ Agency Actions"
+                android:text="⚙️ Agency Management"
                 android:textColor="#FFD700"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
-            <!-- Ajouter lieu -->
             <Button
                 android:id="@+id/btnAddLieu"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:text="➕  Add New Destination"
+                android:text="➕ Add New Destination"
                 android:textColor="#000000"
-                android:textSize="15sp"
-                android:textStyle="bold"
                 android:backgroundTint="#FFD700"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="10dp" />
 
-            <!-- Voir mes lieux -->
             <Button
                 android:id="@+id/btnMyLieux"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:text="🗺️  My Destinations"
+                android:text="🗺️ Manage Destinations"
                 android:textColor="#FFD700"
-                android:textSize="15sp"
-                android:textStyle="bold"
+                android:backgroundTint="#22FFFFFF"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnManageGuides"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="👥 Manage Guides"
+                android:textColor="#FFD700"
+                android:backgroundTint="#22FFFFFF"
+                android:layout_marginBottom="10dp" />
+
+            <Button
+                android:id="@+id/btnManageBookings"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="🗓️ Manage Bookings"
+                android:textColor="#FFD700"
                 android:backgroundTint="#22FFFFFF"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Notifications -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -225,8 +227,6 @@
                 android:layout_height="52dp"
                 android:text="Sign Out"
                 android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="bold"
                 android:backgroundTint="#FFD700" />
 
         </LinearLayout>

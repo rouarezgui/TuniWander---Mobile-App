@@ -15,11 +15,28 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send Global Notification"
+            android:text="Send Notification"
             android:textColor="#FFD700"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginBottom="32dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Target Audience:"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinnerTarget"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#22FFFFFF"
+            android:padding="10dp"
+            android:layout_marginBottom="24dp"
+            android:spinnerMode="dropdown" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -41,7 +58,7 @@
             android:id="@+id/btnSend"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:text="Broadcast to All Users"
+            android:text="Send Notification"
             android:textColor="#000000"
             android:textStyle="bold"
             android:backgroundTint="#FFD700"

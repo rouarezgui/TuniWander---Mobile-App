@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Background image — نفس journey image كما SignIn/SignUp -->
+    <!-- Background image -->
     <ImageView
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Dark overlay — نفس SignIn -->
+    <!-- Dark overlay -->
     <View
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -55,6 +55,7 @@
 
             <!-- Title -->
             <TextView
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Book a Tour"
@@ -160,7 +161,7 @@
                     android:textColorHint="#FFFFFF" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Confirm — gold كما Sign Up -->
+            <!-- Confirm -->
             <Button
                 android:id="@+id/btnConfirmReservation"
                 android:layout_width="match_parent"

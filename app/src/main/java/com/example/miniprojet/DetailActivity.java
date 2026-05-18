@@ -53,6 +53,7 @@ public class DetailActivity extends AppCompatActivity {
         String description = intent.getStringExtra("description");
         String imageUrl    = intent.getStringExtra("imageUrl");
         String categorie   = intent.getStringExtra("categorie");
+        String agenceId    = intent.getStringExtra("agenceId");
 
         // Programme passé comme ArrayList<String> "heure|activite"
         ArrayList<String> programmeRaw =
@@ -71,11 +72,16 @@ public class DetailActivity extends AppCompatActivity {
                     .error(R.drawable.beach)
                     .centerCrop()
                     .into(imgDetailBg);
-        } else {
+        } else if (imageUrl != null) {
+            // Local resource or URL
             int resId = getResources().getIdentifier(
                     imageUrl, "drawable", getPackageName()
             );
-            imgDetailBg.setImageResource(resId != 0 ? resId : R.drawable.beach);
+            if (resId != 0) {
+                imgDetailBg.setImageResource(resId);
+            } else {
+                Glide.with(this).load(imageUrl).placeholder(R.drawable.beach).into(imgDetailBg);
+            }
         }
 
         // Afficher programme du jour
@@ -96,8 +102,9 @@ public class DetailActivity extends AppCompatActivity {
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                 // Logged in → go to ReservationActivity
                 Intent i = new Intent(DetailActivity.this, ReservationActivity.class);
-                i.putExtra("nom",   nom);
-                i.putExtra("ville", ville);
+                i.putExtra("nom",      nom);
+                i.putExtra("ville",    ville);
+                i.putExtra("agenceId", agenceId);
                 startActivity(i);
             } else {
                 // Not logged in → go to SignIn with message

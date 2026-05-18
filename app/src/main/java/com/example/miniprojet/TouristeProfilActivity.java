@@ -2,8 +2,6 @@ package com.example.miniprojet;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -13,18 +11,28 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 public class TouristeProfilActivity extends AppCompatActivity {
 
     private TextView tvAvatar, tvProfilNom, tvProfilEmail;
     private TextView tvNbRsvs, tvNbAvis, tvBack;
     private Button btnSignOut;
-    private LinearLayout layoutReservations, layoutNotifications;
+    private RecyclerView rvReservations;
+    private LinearLayout layoutNotifications;
+    private ReservationAdapter adapter;
+    private List<Map<String, Object>> reservationList;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
@@ -44,7 +52,7 @@ public class TouristeProfilActivity extends AppCompatActivity {
         tvNbAvis            = findViewById(R.id.tvNbAvis);
         tvBack              = findViewById(R.id.tvBack);
         btnSignOut          = findViewById(R.id.btnSignOut);
-        layoutReservations  = findViewById(R.id.layoutReservations);
+        rvReservations      = findViewById(R.id.rvReservations);
         layoutNotifications = findViewById(R.id.layoutNotifications);
 
         FirebaseUser user = mAuth.getCurrentUser();
@@ -52,46 +60,28 @@ public class TouristeProfilActivity extends AppCompatActivity {
 
         tvProfilEmail.setText(user.getEmail());
 
+        // Setup RecyclerView
+        reservationList = new ArrayList<>();
+        adapter = new ReservationAdapter(reservationList, "Touriste");
+        rvReservations.setLayoutManager(new LinearLayoutManager(this));
+        rvReservations.setAdapter(adapter);
+
         // Charger profil
         db.collection("users").document(user.getUid()).get()
                 .addOnSuccessListener(doc -> {
-                    String name = doc.getString("name");
-                    tvProfilNom.setText(name != null ? name : "Traveler");
-                    if (name != null && !name.isEmpty())
-                        tvAvatar.setText(String.valueOf(name.charAt(0)).toUpperCase());
+                    if (doc.exists()) {
+                        String name = doc.getString("name");
+                        tvProfilNom.setText(name != null ? name : "Traveler");
+                        if (name != null && !name.isEmpty())
+                            tvAvatar.setText(String.valueOf(name.charAt(0)).toUpperCase());
+                    }
                 });
 
         // Charger réservations
-        db.collection("reservations")
-                .whereEqualTo("userId", user.getUid()).get()
-                .addOnSuccessListener(snap -> {
-                    tvNbRsvs.setText(String.valueOf(snap.size()));
-                    if (snap.isEmpty()) {
-                        addEmptyMsg(layoutReservations, "No reservations yet — go explore! 🌍");
-                    } else {
-                        for (QueryDocumentSnapshot doc : snap) {
-                            addReservationCard(
-                                    doc.getString("destination"),
-                                    doc.getString("date"),
-                                    doc.getString("persons"),
-                                    doc.getId()
-                            );
-                        }
-                    }
-                });
+        loadReservations(user.getUid());
 
-        // Charger notifications
-        db.collection("notifications")
-                .whereEqualTo("targetRole", "all").get()
-                .addOnSuccessListener(snap -> {
-                    if (snap.isEmpty()) {
-                        addEmptyMsg(layoutNotifications, "No notifications");
-                    } else {
-                        for (QueryDocumentSnapshot doc : snap) {
-                            addNotifCard(doc.getString("message"), doc.getString("date"));
-                        }
-                    }
-                });
+        // Charger notifications filtered by 'All' or 'Touriste'
+        loadNotifications();
 
         tvBack.setOnClickListener(v -> finish());
 
@@ -110,25 +100,34 @@ public class TouristeProfilActivity extends AppCompatActivity {
         });
     }
 
-    private void addReservationCard(String dest, String date, String persons, String rsvId) {
-        View card = LayoutInflater.from(this)
-                .inflate(R.layout.item_reservation_card, layoutReservations, false);
-        ((TextView) card.findViewById(R.id.tvRsvDestination)).setText("📍 " + dest);
-        ((TextView) card.findViewById(R.id.tvRsvDate)).setText("🗓️ " + date);
-        ((TextView) card.findViewById(R.id.tvRsvPersons)).setText("👥 " + persons + " persons");
+    private void loadReservations(String userId) {
+        db.collection("reservations")
+                .whereEqualTo("userId", userId).get()
+                .addOnSuccessListener(snap -> {
+                    tvNbRsvs.setText(String.valueOf(snap.size()));
+                    reservationList.clear();
+                    for (QueryDocumentSnapshot document : snap) {
+                        Map<String, Object> data = document.getData();
+                        data.put("id", document.getId());
+                        reservationList.add(data);
+                    }
+                    adapter.notifyDataSetChanged();
+                });
+    }
 
-        // Rating button
-        Button btnRate = card.findViewById(R.id.btnRate);
-        if (btnRate != null) {
-            btnRate.setVisibility(View.VISIBLE);
-            btnRate.setOnClickListener(v -> {
-                Intent intent = new Intent(this, RatingActivity.class);
-                intent.putExtra("rsvId",       rsvId);
-                intent.putExtra("destination", dest);
-                startActivity(intent);
-            });
-        }
-        layoutReservations.addView(card);
+    private void loadNotifications() {
+        db.collection("notifications")
+                .whereIn("targetRole", Arrays.asList("All", "Touriste")).get()
+                .addOnSuccessListener(snap -> {
+                    layoutNotifications.removeAllViews();
+                    if (snap.isEmpty()) {
+                        addEmptyMsg(layoutNotifications, "No notifications");
+                    } else {
+                        for (QueryDocumentSnapshot doc : snap) {
+                            addNotifCard(doc.getString("message"), doc.getString("date"));
+                        }
+                    }
+                });
     }
 
     private void addNotifCard(String message, String date) {

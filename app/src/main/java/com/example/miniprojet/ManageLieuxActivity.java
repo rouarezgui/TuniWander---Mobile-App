@@ -8,7 +8,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +18,12 @@ import java.util.List;
 public class ManageLieuxActivity extends AppCompatActivity {
 
     private RecyclerView rvLieux;
-    private LieuAdapter adapter;
+    private ManageLieuAdapter adapter;
     private List<Lieu> lieuList;
     private FirebaseFirestore db;
     private TextView tvBack;
     private Button btnAddLieu;
+    private boolean filterByAgence = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +31,14 @@ public class ManageLieuxActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manage_lieux);
 
         db = FirebaseFirestore.getInstance();
+        filterByAgence = getIntent().getBooleanExtra("filterByAgence", false);
+
         rvLieux = findViewById(R.id.rvLieux);
         tvBack = findViewById(R.id.tvBack);
         btnAddLieu = findViewById(R.id.btnAddLieu);
 
         lieuList = new ArrayList<>();
-        adapter = new LieuAdapter(this, lieuList);
+        adapter = new ManageLieuAdapter(this, lieuList);
         rvLieux.setLayoutManager(new LinearLayoutManager(this));
         rvLieux.setAdapter(adapter);
 
@@ -50,7 +55,16 @@ public class ManageLieuxActivity extends AppCompatActivity {
     }
 
     private void loadLieux() {
-        db.collection("lieux").get()
+        Query query = db.collection("lieux");
+        
+        if (filterByAgence) {
+            String currentUid = FirebaseAuth.getInstance().getUid();
+            if (currentUid != null) {
+                query = query.whereEqualTo("agenceId", currentUid);
+            }
+        }
+
+        query.get()
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 lieuList.clear();
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {

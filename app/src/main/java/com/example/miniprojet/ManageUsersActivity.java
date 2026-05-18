@@ -44,7 +44,10 @@ public class ManageUsersActivity extends AppCompatActivity {
             .addOnSuccessListener(queryDocumentSnapshots -> {
                 userList.clear();
                 for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                    userList.add(document.getData());
+                    Map<String, Object> userData = document.getData();
+                    // Crucial: ensure document ID is stored so Adapter can update/delete
+                    userData.put("uid", document.getId());
+                    userList.add(userData);
                 }
                 adapter.notifyDataSetChanged();
             })

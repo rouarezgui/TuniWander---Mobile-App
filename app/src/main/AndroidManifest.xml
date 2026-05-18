@@ -6,9 +6,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/tuniwander_logo1"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/tuniwander_logo1"
         android:supportsRtl="true"
         android:theme="@style/Theme.MiniProjet">
 
@@ -41,6 +41,7 @@
         <activity android:name=".ManageUsersActivity" android:exported="false" />
         <activity android:name=".ManageReservationsActivity" android:exported="false" />
         <activity android:name=".SendNotificationActivity" android:exported="false" />
+        <activity android:name=".ManageGuidesActivity" android:exported="false" />
 
     </application>
 

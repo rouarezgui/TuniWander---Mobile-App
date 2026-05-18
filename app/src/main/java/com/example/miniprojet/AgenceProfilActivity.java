@@ -20,7 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 public class AgenceProfilActivity extends AppCompatActivity {
 
     private TextView tvNomAgence, tvProfilEmail, tvVerified, tvNbLieux, tvNbGuides, tvBack;
-    private Button btnAddLieu, btnMyLieux, btnSignOut;
+    private Button btnAddLieu, btnMyLieux, btnManageGuides, btnManageBookings, btnSignOut;
     private LinearLayout layoutNotifications;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -42,6 +42,8 @@ public class AgenceProfilActivity extends AppCompatActivity {
         tvBack              = findViewById(R.id.tvBack);
         btnAddLieu          = findViewById(R.id.btnAddLieu);
         btnMyLieux          = findViewById(R.id.btnMyLieux);
+        btnManageGuides     = findViewById(R.id.btnManageGuides);
+        btnManageBookings   = findViewById(R.id.btnManageBookings);
         btnSignOut          = findViewById(R.id.btnSignOut);
         layoutNotifications = findViewById(R.id.layoutNotifications);
 
@@ -54,7 +56,7 @@ public class AgenceProfilActivity extends AppCompatActivity {
         db.collection("users").document(user.getUid()).get()
                 .addOnSuccessListener(doc -> {
                     String nomAgence = doc.getString("nomAgence");
-                    Boolean verified = doc.getBoolean("verified");
+                    Boolean verified = doc.getBoolean("isVerified");
 
                     tvNomAgence.setText(nomAgence != null ? nomAgence : "My Agency");
 
@@ -77,10 +79,11 @@ public class AgenceProfilActivity extends AppCompatActivity {
                 .whereEqualTo("agenceId", user.getUid()).get()
                 .addOnSuccessListener(snap -> tvNbGuides.setText(String.valueOf(snap.size())));
 
-        // Notifications
+        // Notifications logic
         db.collection("notifications")
-                .whereEqualTo("targetRole", "all").get()
+                .whereIn("targetRole", java.util.Arrays.asList("All", "Agence")).get()
                 .addOnSuccessListener(snap -> {
+                    layoutNotifications.removeAllViews();
                     if (snap.isEmpty()) {
                         TextView tv = new TextView(this);
                         tv.setText("No notifications");
@@ -108,12 +111,21 @@ public class AgenceProfilActivity extends AppCompatActivity {
         btnAddLieu.setOnClickListener(v ->
                 startActivity(new Intent(this, AddEditLieuActivity.class)));
 
-        btnMyLieux.setOnClickListener(v ->
-                startActivity(new Intent(this, ListeLieuxActivity.class)));
+        btnMyLieux.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ManageLieuxActivity.class);
+            intent.putExtra("filterByAgence", true);
+            startActivity(intent);
+        });
+
+        btnManageGuides.setOnClickListener(v ->
+                startActivity(new Intent(this, ManageGuidesActivity.class)));
+
+        btnManageBookings.setOnClickListener(v ->
+                startActivity(new Intent(this, ManageReservationsActivity.class)));
 
         btnSignOut.setOnClickListener(v -> {
             mAuth.signOut();
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(AgenceProfilActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();

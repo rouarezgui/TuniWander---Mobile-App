@@ -15,6 +15,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -40,29 +44,58 @@ public class SignInActivity extends AppCompatActivity {
         etPassword     = findViewById(R.id.Password);
 
         btnSignIn.setOnClickListener(v -> {
-            String email = etEmail.getText().toString().trim();
-            String pass  = etPassword.getText().toString().trim();
+            String emailInput = etEmail.getText().toString().trim();
+            String passInput  = etPassword.getText().toString().trim();
 
-            if (email.isEmpty()) { etEmail.setError("Enter your email");    return; }
-            if (pass.isEmpty())  { etPassword.setError("Enter a password"); return; }
+            if (emailInput.isEmpty()) { etEmail.setError("Enter your email");    return; }
+            if (passInput.isEmpty())  { etPassword.setError("Enter a password"); return; }
 
-            mAuth.signInWithEmailAndPassword(email, pass)
+            mAuth.signInWithEmailAndPassword(emailInput, passInput)
                     .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
+                        if (task.isSuccessful() && mAuth.getCurrentUser() != null) {
                             String uid = mAuth.getCurrentUser().getUid();
-                            // Lire le role depuis Firestore puis rediriger
+                            String emailFromAuth = mAuth.getCurrentUser().getEmail();
+
                             db.collection("users").document(uid).get()
                                     .addOnSuccessListener(doc -> {
-                                        String role = doc.getString("role");
-                                        if (role == null) role = "Touriste";
-                                        Toast.makeText(this,
-                                                "Welcome back! ✅", Toast.LENGTH_SHORT).show();
-                                        redirectByRole(role);
+                                        if (doc.exists()) {
+                                            String role = doc.getString("role");
+                                            Boolean isVerified = doc.getBoolean("isVerified");
+
+                                            boolean isRouaAdmin = isRouaAdminEmail(emailFromAuth);
+                                            boolean isAdmin = isRouaAdmin || "Admin".equals(role);
+                                            
+                                            boolean isVerifiedUser = (isVerified != null && isVerified);
+
+                                            if (isAdmin || isVerifiedUser) {
+                                                String finalRole = isAdmin ? "Admin" : (role != null ? role : "Touriste");
+                                                Toast.makeText(this, "Welcome back! ✅", Toast.LENGTH_SHORT).show();
+                                                if (isRouaAdmin) {
+                                                    ensureRouaAdminProfile(uid, emailFromAuth, doc.getString("name"),
+                                                            () -> redirectByRole(finalRole));
+                                                } else {
+                                                    redirectByRole(finalRole);
+                                                }
+                                            } else {
+                                                Toast.makeText(this, "Your account is not verified yet by Admin Roua ⏳", Toast.LENGTH_LONG).show();
+                                                mAuth.signOut();
+                                            }
+                                        } else {
+                                            if (isRouaAdminEmail(emailFromAuth)) {
+                                                ensureRouaAdminProfile(uid, emailFromAuth, "Roua Rezgui",
+                                                        () -> redirectByRole("Admin"));
+                                            } else {
+                                                Toast.makeText(this, "User profile not found.", Toast.LENGTH_SHORT).show();
+                                                mAuth.signOut();
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(this, "Error fetching profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        mAuth.signOut();
                                     });
                         } else {
-                            Toast.makeText(this,
-                                    "Error: " + task.getException().getMessage(),
-                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Error: " + (task.getException() != null ? task.getException().getMessage() : "Authentication failed"), Toast.LENGTH_LONG).show();
                         }
                     });
         });
@@ -84,8 +117,8 @@ public class SignInActivity extends AppCompatActivity {
         Intent intent;
         switch (role) {
             case "Admin":  intent = new Intent(this, AdminDashboardActivity.class); break;
-            case "Guide":  intent = new Intent(this, ListeLieuxActivity.class);     break;
-            case "Agence": intent = new Intent(this, ListeLieuxActivity.class);     break;
+            case "Guide":  intent = new Intent(this, GuideProfilActivity.class);    break;
+            case "Agence": intent = new Intent(this, AgenceProfilActivity.class);   break;
             default:       intent = new Intent(this, ListeLieuxActivity.class);     break;
         }
         startActivity(intent);
@@ -97,12 +130,58 @@ public class SignInActivity extends AppCompatActivity {
         super.onStart();
         if (mAuth.getCurrentUser() != null) {
             String uid = mAuth.getCurrentUser().getUid();
+            String emailFromAuth = mAuth.getCurrentUser().getEmail();
             db.collection("users").document(uid).get()
                     .addOnSuccessListener(doc -> {
-                        String role = doc.getString("role");
-                        if (role == null) role = "Touriste";
-                        redirectByRole(role);
+                        if (doc.exists()) {
+                            String role = doc.getString("role");
+                            Boolean isVerified = doc.getBoolean("isVerified");
+                            
+                            boolean isRouaAdmin = isRouaAdminEmail(emailFromAuth);
+                            boolean isAdmin = isRouaAdmin || "Admin".equals(role);
+                            
+                            if (isAdmin || (isVerified != null && isVerified)) {
+                                String finalRole = isAdmin ? "Admin" : (role != null ? role : "Touriste");
+                                if (isRouaAdmin) {
+                                    ensureRouaAdminProfile(uid, emailFromAuth, doc.getString("name"),
+                                            () -> redirectByRole(finalRole));
+                                } else {
+                                    redirectByRole(finalRole);
+                                }
+                            } else {
+                                mAuth.signOut();
+                            }
+                        }
+                        else if (isRouaAdminEmail(emailFromAuth)) {
+                            ensureRouaAdminProfile(uid, emailFromAuth, "Roua Rezgui",
+                                    () -> redirectByRole("Admin"));
+                        }
                     });
         }
+    }
+
+    private boolean isRouaAdminEmail(String email) {
+        return email != null && email.equalsIgnoreCase("roua@gmail.com");
+    }
+
+    private void ensureRouaAdminProfile(String uid, String email, String name, Runnable onReady) {
+        Map<String, Object> adminData = new HashMap<>();
+        adminData.put("uid", uid);
+        adminData.put("email", email != null ? email : "roua@gmail.com");
+        adminData.put("name", name != null && !name.trim().isEmpty() ? name : "Roua Rezgui");
+        adminData.put("role", "Admin");
+        adminData.put("isVerified", true);
+
+        db.collection("users").document(uid)
+                .set(adminData, SetOptions.merge())
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(this,
+                                "Admin profile sync failed: " +
+                                        (task.getException() != null ? task.getException().getMessage() : "unknown error"),
+                                Toast.LENGTH_LONG).show();
+                    }
+                    onReady.run();
+                });
     }
 }

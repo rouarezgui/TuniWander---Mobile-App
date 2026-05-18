@@ -54,11 +54,15 @@ public class LieuAdapter extends RecyclerView.Adapter<LieuAdapter.LieuViewHolder
                     .error(R.drawable.beach)
                     .centerCrop()
                     .into(holder.imgLieu);
-        } else {
+        } else if (imageUrl != null) {
             int resId = context.getResources().getIdentifier(
                     imageUrl, "drawable", context.getPackageName()
             );
-            holder.imgLieu.setImageResource(resId != 0 ? resId : R.drawable.beach);
+            if (resId != 0) {
+                holder.imgLieu.setImageResource(resId);
+            } else {
+                Glide.with(context).load(imageUrl).placeholder(R.drawable.beach).into(holder.imgLieu);
+            }
         }
 
         // Click → DetailActivity avec programme
@@ -69,6 +73,8 @@ public class LieuAdapter extends RecyclerView.Adapter<LieuAdapter.LieuViewHolder
             intent.putExtra("description", lieu.getDescription());
             intent.putExtra("imageUrl",    lieu.getImageUrl());
             intent.putExtra("categorie",   lieu.getCategorie());
+            intent.putExtra("agenceId",    lieu.getAgenceId());
+            intent.putExtra("guideId",     lieu.getGuideId());
 
             // Passer programme comme ArrayList<String> "heure|activite"
             ArrayList<String> programmeList = new ArrayList<>();

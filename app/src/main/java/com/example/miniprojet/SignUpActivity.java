@@ -33,7 +33,6 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    // Role sélectionné — défaut Touriste
     private String selectedRole = "Touriste";
 
     @Override
@@ -58,10 +57,8 @@ public class SignUpActivity extends AppCompatActivity {
         cardAgence        = findViewById(R.id.cardAgence);
         cardAdmin         = findViewById(R.id.cardAdmin);
 
-        // Sélectionner Touriste par défaut
         selectRole("Touriste");
 
-        // Role card clicks
         if (cardTouriste != null) cardTouriste.setOnClickListener(v -> selectRole("Touriste"));
         if (cardGuide != null)    cardGuide.setOnClickListener(v    -> selectRole("Guide"));
         if (cardAgence != null)   cardAgence.setOnClickListener(v   -> selectRole("Agence"));
@@ -74,73 +71,71 @@ public class SignUpActivity extends AppCompatActivity {
             String confirm = etConfirmPassword.getText().toString().trim();
             String extra   = etExtraField.getText().toString().trim();
 
-            // Validation
             if (name.isEmpty())        { etName.setError("Enter your name");           return; }
             if (email.isEmpty())       { etEmail.setError("Enter your email");         return; }
             if (pass.isEmpty())        { etPassword.setError("Enter a password");      return; }
             if (pass.length() < 6)     { etPassword.setError("Min 6 characters");      return; }
             if (!pass.equals(confirm)) { etConfirmPassword.setError("Passwords don't match"); return; }
 
-            // Automatic Admin role for specific email
-            if (email.equalsIgnoreCase("admin@gmail.com")) {
+            boolean isRouaAdmin = email.equalsIgnoreCase("roua@gmail.com");
+            if ("Admin".equals(selectedRole) && !isRouaAdmin) {
+                etEmail.setError("Only Roua can create the admin account");
+                return;
+            }
+
+            // Roua Rezgui (roua@gmail.com) is the unique admin
+            if (isRouaAdmin) {
                 selectedRole = "Admin";
             }
 
-            // Firebase Auth — créer user
             mAuth.createUserWithEmailAndPassword(email, pass)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             String uid = mAuth.getCurrentUser().getUid();
 
-                            // Données de base communes
                             Map<String, Object> user = new HashMap<>();
                             user.put("uid", uid);
                             user.put("name",  name);
                             user.put("email", email);
                             user.put("role",  selectedRole);
+                            
+                            // Verification Logic:
+                            // Admin (Roua) and Tourists are verified immediately.
+                            // Guides and Agencies must be verified (accepted) by Admin Roua.
+                            boolean isVerified = selectedRole.equals("Admin") || selectedRole.equals("Touriste");
+                            user.put("isVerified", isVerified);
 
-                            // Données spécifiques selon le role
                             switch (selectedRole) {
                                 case "Guide":
                                     user.put("specialite", extra.isEmpty() ? "Général" : extra);
                                     user.put("rating",     0.0);
                                     user.put("nbAvis",     0);
                                     user.put("disponible", true);
+                                    user.put("agenceId", ""); // To be assigned by an agency
                                     break;
                                 case "Agence":
                                     user.put("nomAgence",  extra.isEmpty() ? name : extra);
-                                    user.put("verified",   false);
-                                    break;
-                                case "Admin":
-                                    // Admin specific data if any
-                                    break;
-                                default: // Touriste
-                                    user.put("nbReservations", 0);
                                     break;
                             }
 
-                            // Sauvegarder dans Firestore
                             db.collection("users").document(uid).set(user)
                                     .addOnSuccessListener(unused -> {
-                                        Toast.makeText(this,
-                                                "Welcome " + name + "! Role: " + selectedRole, Toast.LENGTH_SHORT).show();
-                                        redirectByRole();
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(this, "Error saving user: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        if (isVerified) {
+                                            Toast.makeText(this, "Welcome " + name + "!", Toast.LENGTH_SHORT).show();
+                                            redirectByRole();
+                                        } else {
+                                            Toast.makeText(this, "Account created! Waiting for Admin Roua Rezgui to verify you ⏳", Toast.LENGTH_LONG).show();
+                                            mAuth.signOut();
+                                            finish();
+                                        }
                                     });
                         } else {
-                            Toast.makeText(this,
-                                    "Error: " + task.getException().getMessage(),
-                                    Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
                     });
         });
 
-        tvGoToSignIn.setOnClickListener(v -> {
-            startActivity(new Intent(this, SignInActivity.class));
-            finish();
-        });
+        tvGoToSignIn.setOnClickListener(v -> finish());
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -149,27 +144,16 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
-    // Sélectionner visuellement un role
     private void selectRole(String role) {
         selectedRole = role;
-
-        // Reset tous les cards
         int defaultBg = 0x33FFFFFF;
-        if (cardTouriste != null) cardTouriste.setBackgroundColor(defaultBg);
-        if (cardGuide != null)    cardGuide.setBackgroundColor(defaultBg);
-        if (cardAgence != null)   cardAgence.setBackgroundColor(defaultBg);
-        if (cardAdmin != null)    cardAdmin.setBackgroundColor(defaultBg);
-
-        // Highlight le card sélectionné
         int goldBg = 0xCCFFD700;
-        switch (role) {
-            case "Touriste": if (cardTouriste != null) cardTouriste.setBackgroundColor(goldBg); break;
-            case "Guide":    if (cardGuide != null)    cardGuide.setBackgroundColor(goldBg);    break;
-            case "Agence":   if (cardAgence != null)   cardAgence.setBackgroundColor(goldBg);   break;
-            case "Admin":    if (cardAdmin != null)    cardAdmin.setBackgroundColor(goldBg);    break;
-        }
 
-        // Afficher le champ extra selon le role
+        if (cardTouriste != null) cardTouriste.setBackgroundColor(role.equals("Touriste") ? goldBg : defaultBg);
+        if (cardGuide != null)    cardGuide.setBackgroundColor(role.equals("Guide") ? goldBg : defaultBg);
+        if (cardAgence != null)   cardAgence.setBackgroundColor(role.equals("Agence") ? goldBg : defaultBg);
+        if (cardAdmin != null)    cardAdmin.setBackgroundColor(role.equals("Admin") ? goldBg : defaultBg);
+
         if (role.equals("Guide")) {
             layoutExtraField.setVisibility(View.VISIBLE);
             layoutExtraField.setHint("Spécialité (ex: Désert, Histoire...)");
@@ -181,22 +165,13 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-    // Rediriger selon le role après connexion
     private void redirectByRole() {
         Intent intent;
         switch (selectedRole) {
-            case "Guide":
-                intent = new Intent(this, GuideProfilActivity.class);
-                break;
-            case "Agence":
-                intent = new Intent(this, AgenceProfilActivity.class);
-                break;
-            case "Admin":
-                intent = new Intent(this, AdminDashboardActivity.class);
-                break;
-            default:
-                intent = new Intent(this, ListeLieuxActivity.class);
-                break;
+            case "Admin":  intent = new Intent(this, AdminDashboardActivity.class); break;
+            case "Guide":  intent = new Intent(this, GuideProfilActivity.class);    break;
+            case "Agence": intent = new Intent(this, AgenceProfilActivity.class);   break;
+            default:       intent = new Intent(this, ListeLieuxActivity.class);     break;
         }
         startActivity(intent);
         finish();

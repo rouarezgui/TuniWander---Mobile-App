@@ -39,7 +39,6 @@
             android:orientation="vertical"
             android:padding="28dp">
 
-            <!-- Back -->
             <TextView
                 android:id="@+id/tvBack"
                 android:layout_width="wrap_content"
@@ -53,7 +52,6 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <!-- Avatar -->
             <TextView
                 android:id="@+id/tvAvatar"
                 android:layout_width="90dp"
@@ -66,7 +64,6 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="12dp" />
 
-            <!-- Name -->
             <TextView
                 android:id="@+id/tvProfilNom"
                 android:layout_width="wrap_content"
@@ -78,7 +75,6 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="4dp" />
 
-            <!-- Email -->
             <TextView
                 android:id="@+id/tvProfilEmail"
                 android:layout_width="wrap_content"
@@ -87,27 +83,8 @@
                 android:textSize="14sp"
                 android:gravity="center"
                 android:layout_gravity="center"
-                android:layout_marginBottom="8dp" />
-
-            <!-- Role badge -->
-            <TextView
-                android:id="@+id/tvRole"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🧳 Touriste"
-                android:background="#FFD700"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:layout_gravity="center"
                 android:layout_marginBottom="28dp" />
 
-            <!-- Gold divider -->
             <View
                 android:layout_width="60dp"
                 android:layout_height="2dp"
@@ -115,13 +92,11 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Stats row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="24dp">
-
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="70dp"
@@ -145,9 +120,8 @@
                         android:textColor="#CCFFFFFF"
                         android:textSize="11sp" />
                 </LinearLayout>
-
                 <LinearLayout
-                    android:id="@+id/btnRate"
+                    android:id="@+id/btnRateHeader"
                     android:layout_width="0dp"
                     android:layout_height="70dp"
                     android:layout_weight="1"
@@ -169,10 +143,8 @@
                         android:textColor="#CCFFFFFF"
                         android:textSize="11sp" />
                 </LinearLayout>
-
             </LinearLayout>
 
-            <!-- My Reservations -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -182,14 +154,13 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="12dp" />
 
-            <LinearLayout
-                android:id="@+id/layoutReservations"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvReservations"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:nestedScrollingEnabled="false"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Notifications -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -205,22 +176,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_marginBottom="24dp" />
-
-            <!-- Divider -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="20dp">
-                <View android:layout_width="0dp" android:layout_height="1dp"
-                    android:layout_weight="1" android:background="#44FFFFFF" />
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:text="  account  "
-                    android:textColor="#AAFFFFFF" android:textSize="13sp" />
-                <View android:layout_width="0dp" android:layout_height="1dp"
-                    android:layout_weight="1" android:background="#44FFFFFF" />
-            </LinearLayout>
 
             <Button
                 android:id="@+id/btnSignOut"

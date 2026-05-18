@@ -43,7 +43,7 @@ public class ProfilActivity extends AppCompatActivity {
         tvRole             = findViewById(R.id.tvRole);
         tvBack             = findViewById(R.id.tvBack);
         btnSignOut         = findViewById(R.id.btnSignOut);
-        layoutReservations = findViewById(R.id.layoutReservations);
+        layoutReservations = findViewById(R.id.layoutTours);
 
         FirebaseUser user = mAuth.getCurrentUser();
 

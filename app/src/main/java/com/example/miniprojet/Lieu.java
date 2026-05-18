@@ -12,9 +12,10 @@ public class Lieu {
     private String imageUrl;
     private String categorie;
     private List<Map<String, String>> programme;
-    private Double rating;    // ← زيد هذا
-    private Long   nbAvis;    // ← زيد هذا
-    private String agenceId;  // ← زيد هذا
+    private Double rating;
+    private Long   nbAvis;
+    private String agenceId;
+    private String guideId; // Add guideId to link a guide to a tour
 
     public Lieu() {}
 
@@ -42,6 +43,7 @@ public class Lieu {
     public Double getRating()      { return rating; }
     public Long   getNbAvis()      { return nbAvis; }
     public String getAgenceId()    { return agenceId; }
+    public String getGuideId()     { return guideId; }
 
     public void setId(String id)                   { this.id = id; }
     public void setNom(String nom)                 { this.nom = nom; }
@@ -53,4 +55,5 @@ public class Lieu {
     public void setRating(Double rating)           { this.rating = rating; }
     public void setNbAvis(Long nbAvis)             { this.nbAvis = nbAvis; }
     public void setAgenceId(String agenceId)       { this.agenceId = agenceId; }
+    public void setGuideId(String guideId)         { this.guideId = guideId; }
 }

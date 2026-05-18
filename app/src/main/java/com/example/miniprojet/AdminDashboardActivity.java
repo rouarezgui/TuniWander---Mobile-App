@@ -19,7 +19,7 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private TextView tvStatUsers, tvStatLieux, tvStatRsvs;
     private LinearLayout btnManageLieux, btnManageUsers, btnManageRsvs, btnSendNotif;
-    private Button btnSignOut, btnMyProfil;
+    private Button btnSignOut;
     private FirebaseFirestore db;
 
     @Override
@@ -38,12 +38,9 @@ public class AdminDashboardActivity extends AppCompatActivity {
         btnManageRsvs  = findViewById(R.id.btnManageRsvs);
         btnSendNotif   = findViewById(R.id.btnSendNotif);
         btnSignOut     = findViewById(R.id.btnSignOut);
-        btnMyProfil    = findViewById(R.id.btnMyProfil);
 
-        // Load stats
         loadStats();
 
-        // Navigation
         btnManageLieux.setOnClickListener(v ->
                 startActivity(new Intent(this, ManageLieuxActivity.class)));
 
@@ -55,9 +52,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
         btnSendNotif.setOnClickListener(v ->
                 startActivity(new Intent(this, SendNotificationActivity.class)));
-
-        btnMyProfil.setOnClickListener(v ->
-                startActivity(new Intent(this, AdminProfilActivity.class)));
 
         btnSignOut.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -75,11 +69,12 @@ public class AdminDashboardActivity extends AppCompatActivity {
     }
 
     private void loadStats() {
-        // Count users
         db.collection("users").get().addOnSuccessListener(snap ->
                 tvStatUsers.setText(String.valueOf(snap.size())));
 
-        // Count reservations
+        db.collection("lieux").get().addOnSuccessListener(snap ->
+                tvStatLieux.setText(String.valueOf(snap.size())));
+
         db.collection("reservations").get().addOnSuccessListener(snap ->
                 tvStatRsvs.setText(String.valueOf(snap.size())));
     }

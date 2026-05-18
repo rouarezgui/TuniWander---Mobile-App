@@ -26,6 +26,34 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="24dp" />
 
+            <!-- Image Preview and Selection -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                app:cardCornerRadius="12dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="#22FFFFFF">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <ImageView
+                        android:id="@+id/imgPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/beach" />
+                    <Button
+                        android:id="@+id/btnSelectImage"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Select Image from Gallery"
+                        android:textSize="12sp"
+                        android:backgroundTint="#AA000000"
+                        android:textColor="#FFFFFF" />
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
@@ -74,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Description"
                 android:textColorHint="#AAFFFFFF"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="16dp">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDescription"
                     android:layout_width="match_parent"
@@ -84,19 +112,26 @@
                     android:gravity="top" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+            <!-- Guide Selector (for Agencies) -->
+            <TextView
+                android:id="@+id/tvSelectGuideLabel"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="Image URL"
-                android:textColorHint="#AAFFFFFF"
-                android:layout_marginBottom="24dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etImageUrl"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="#FFFFFF" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:text="Assign a Guide:"
+                android:textColor="#FFD700"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone" />
+
+            <Spinner
+                android:id="@+id/spinnerGuides"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#22FFFFFF"
+                android:padding="10dp"
+                android:layout_marginBottom="24dp"
+                android:spinnerMode="dropdown"
+                android:visibility="gone" />
 
             <Button
                 android:id="@+id/btnSave"
@@ -118,5 +153,15 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
