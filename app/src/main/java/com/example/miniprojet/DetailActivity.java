@@ -109,7 +109,7 @@ public class DetailActivity extends AppCompatActivity {
             } else {
                 // Not logged in → go to SignIn with message
                 Toast.makeText(this,
-                        "Please sign in to book a tour 🔐",
+                        "Please sign in to book a tour ",
                         Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(DetailActivity.this, SignInActivity.class);
                 startActivity(i);

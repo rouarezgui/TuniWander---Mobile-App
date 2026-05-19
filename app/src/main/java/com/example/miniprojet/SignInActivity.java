@@ -69,7 +69,7 @@ public class SignInActivity extends AppCompatActivity {
 
                                             if (isAdmin || isVerifiedUser) {
                                                 String finalRole = isAdmin ? "Admin" : (role != null ? role : "Touriste");
-                                                Toast.makeText(this, "Welcome back! ✅", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(this, "Welcome back! ", Toast.LENGTH_SHORT).show();
                                                 if (isRouaAdmin) {
                                                     ensureRouaAdminProfile(uid, emailFromAuth, doc.getString("name"),
                                                             () -> redirectByRole(finalRole));
@@ -77,7 +77,7 @@ public class SignInActivity extends AppCompatActivity {
                                                     redirectByRole(finalRole);
                                                 }
                                             } else {
-                                                Toast.makeText(this, "Your account is not verified yet by Admin Roua ⏳", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(this, "Your account is not verified yet by Admin Roua ", Toast.LENGTH_LONG).show();
                                                 mAuth.signOut();
                                             }
                                         } else {

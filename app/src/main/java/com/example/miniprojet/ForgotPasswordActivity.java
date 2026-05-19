@@ -41,7 +41,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Toast.makeText(this,
-                                    "Reset link sent! Check your email ✅",
+                                    "Reset link sent! Check your email ",
                                     Toast.LENGTH_LONG).show();
                             startActivity(new Intent(this, SignInActivity.class));
                             finish();

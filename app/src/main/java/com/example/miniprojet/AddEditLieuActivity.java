@@ -22,13 +22,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class AddEditLieuActivity extends AppCompatActivity {
 
@@ -38,7 +36,7 @@ public class AddEditLieuActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView tvTitle, tvSelectGuideLabel;
     private Spinner spinnerGuides;
-    
+
     private FirebaseFirestore db;
     private FirebaseStorage storage;
     private String lieuId = null;
@@ -53,6 +51,16 @@ public class AddEditLieuActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     imageUri = result.getData().getData();
+                    if (imageUri != null) {
+                        try {
+                            getContentResolver().takePersistableUriPermission(
+                                    imageUri,
+                                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            );
+                        } catch (SecurityException ignored) {
+                            // Some gallery apps return non-persistable URIs; Glide can still preview them now.
+                        }
+                    }
                     imgPreview.setImageURI(imageUri);
                 }
             }
@@ -76,7 +84,7 @@ public class AddEditLieuActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
-        
+
         tvSelectGuideLabel = findViewById(R.id.tvSelectGuideLabel);
         spinnerGuides = findViewById(R.id.spinnerGuides);
 
@@ -91,15 +99,18 @@ public class AddEditLieuActivity extends AppCompatActivity {
             etCategorie.setText(getIntent().getStringExtra("categorie"));
             etDescription.setText(getIntent().getStringExtra("description"));
             existingImageUrl = getIntent().getStringExtra("imageUrl");
-            
+
             if (existingImageUrl != null && !existingImageUrl.isEmpty()) {
                 Glide.with(this).load(existingImageUrl).placeholder(R.drawable.beach).into(imgPreview);
             }
         }
 
         btnSelectImage.setOnClickListener(v -> {
-            Intent intent = new Intent(Intent.ACTION_PICK);
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.setType("image/*");
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
             imagePickerLauncher.launch(intent);
         });
 
@@ -150,19 +161,7 @@ public class AddEditLieuActivity extends AppCompatActivity {
     private void uploadImageAndSave() {
         progressBar.setVisibility(View.VISIBLE);
         btnSave.setEnabled(false);
-
-        String fileName = UUID.randomUUID().toString();
-        StorageReference ref = storage.getReference().child("lieux_images/" + fileName);
-
-        ref.putFile(imageUri)
-            .addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl().addOnSuccessListener(uri -> {
-                saveLieu(uri.toString());
-            }))
-            .addOnFailureListener(e -> {
-                progressBar.setVisibility(View.GONE);
-                btnSave.setEnabled(true);
-                Toast.makeText(this, "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+        saveLieu(imageUri.toString());
     }
 
     private void saveLieu(String imageUrl) {
@@ -185,7 +184,7 @@ public class AddEditLieuActivity extends AppCompatActivity {
         lieu.put("categorie", cat);
         lieu.put("description", desc);
         lieu.put("imageUrl", imageUrl);
-        
+
         if ("Agence".equals(currentRole)) {
             lieu.put("agenceId", currentUid);
             int selectedPos = spinnerGuides.getSelectedItemPosition();
@@ -202,16 +201,16 @@ public class AddEditLieuActivity extends AppCompatActivity {
 
         if (lieuId != null) {
             db.collection("lieux").document(lieuId).update(lieu)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Updated successfully!", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Updated successfully!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
         } else {
             db.collection("lieux").add(lieu)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(this, "Added successfully!", Toast.LENGTH_SHORT).show();
-                    finish();
-                });
+                    .addOnSuccessListener(documentReference -> {
+                        Toast.makeText(this, "Added successfully!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
         }
     }
 }
