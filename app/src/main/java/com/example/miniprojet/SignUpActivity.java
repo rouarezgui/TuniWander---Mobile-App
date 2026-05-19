@@ -98,7 +98,7 @@ public class SignUpActivity extends AppCompatActivity {
                             user.put("name",  name);
                             user.put("email", email);
                             user.put("role",  selectedRole);
-                            
+
                             // Verification Logic:
                             // Admin (Roua) and Tourists are verified immediately.
                             // Guides and Agencies must be verified (accepted) by Admin Roua.

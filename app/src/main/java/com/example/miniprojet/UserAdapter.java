@@ -38,13 +38,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         String name = (String) user.get("name");
         String email = (String) user.get("email");
         String role = user.get("role") != null ? String.valueOf(user.get("role")) : null;
-        
+
         boolean isVerified = isUserVerified(user.get("isVerified"));
 
         holder.tvUserName.setText(name != null ? name : "No Name");
         holder.tvUserEmail.setText(email != null ? email : "No Email");
         holder.tvUserRole.setText(role != null ? role : "No Role");
-        
+
         if (name != null && !name.isEmpty()) {
             holder.tvUserAvatar.setText(String.valueOf(name.charAt(0)).toUpperCase());
         } else {
@@ -75,7 +75,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             }
         });
 
-        holder.btnDelete.setOnClickListener(v -> {
+        holder.btnRefuse.setOnClickListener(v -> {
             int adapterPosition = holder.getBindingAdapterPosition();
             if (uid != null && adapterPosition != RecyclerView.NO_POSITION) {
                 db.collection("users").document(uid).delete()
@@ -83,11 +83,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                             userList.remove(adapterPosition);
                             notifyItemRemoved(adapterPosition);
                             notifyItemRangeChanged(adapterPosition, userList.size());
-                            Toast.makeText(v.getContext(), "User deleted", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(v.getContext(), "User refused", Toast.LENGTH_SHORT).show();
                         })
                         .addOnFailureListener(e -> Toast.makeText(v.getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             } else {
-                Toast.makeText(v.getContext(), "Cannot delete this user.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), "Cannot refuse this user.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -120,7 +120,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView tvUserAvatar, tvUserName, tvUserEmail, tvUserRole;
         View layoutVerify;
-        Button btnAccept, btnDelete;
+        Button btnAccept, btnRefuse;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -130,7 +130,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             tvUserRole = itemView.findViewById(R.id.tvUserRole);
             layoutVerify = itemView.findViewById(R.id.layoutVerify);
             btnAccept = itemView.findViewById(R.id.btnAccept);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
+            btnRefuse = itemView.findViewById(R.id.btnRefuse);
         }
     }
 }

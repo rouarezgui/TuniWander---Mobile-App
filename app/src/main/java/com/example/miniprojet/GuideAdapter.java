@@ -61,7 +61,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             holder.btnAccept.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFFFFD700)); // Gold
         }
 
-        holder.btnDelete.setVisibility(View.GONE); // Use btnAccept for toggle
+        holder.btnRefuse.setVisibility(View.GONE); // Use btnAccept for toggle
 
         holder.btnAccept.setOnClickListener(v -> {
             if (uid == null) return;
@@ -86,7 +86,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
     static class GuideViewHolder extends RecyclerView.ViewHolder {
         TextView tvUserAvatar, tvUserName, tvUserEmail, tvUserRole;
         View layoutVerify;
-        Button btnAccept, btnDelete;
+        Button btnAccept, btnRefuse;
 
         public GuideViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -96,7 +96,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
             tvUserRole = itemView.findViewById(R.id.tvUserRole);
             layoutVerify = itemView.findViewById(R.id.layoutVerify);
             btnAccept = itemView.findViewById(R.id.btnAccept);
-            btnDelete = itemView.findViewById(R.id.btnDelete);
+            btnRefuse = itemView.findViewById(R.id.btnRefuse);
         }
     }
 }

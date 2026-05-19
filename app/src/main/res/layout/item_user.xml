@@ -88,10 +88,10 @@
                 android:layout_marginEnd="8dp" />
 
             <Button
-                android:id="@+id/btnDelete"
+                android:id="@+id/btnRefuse"
                 android:layout_width="wrap_content"
                 android:layout_height="36dp"
-                android:text="Delete"
+                android:text="Refuse"
                 android:textSize="12sp"
                 android:textColor="#FFFFFF"
                 android:backgroundTint="#FF4444" />

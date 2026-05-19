@@ -64,7 +64,7 @@ public class SignInActivity extends AppCompatActivity {
 
                                             boolean isRouaAdmin = isRouaAdminEmail(emailFromAuth);
                                             boolean isAdmin = isRouaAdmin || "Admin".equals(role);
-                                            
+
                                             boolean isVerifiedUser = (isVerified != null && isVerified);
 
                                             if (isAdmin || isVerifiedUser) {
@@ -136,10 +136,10 @@ public class SignInActivity extends AppCompatActivity {
                         if (doc.exists()) {
                             String role = doc.getString("role");
                             Boolean isVerified = doc.getBoolean("isVerified");
-                            
+
                             boolean isRouaAdmin = isRouaAdminEmail(emailFromAuth);
                             boolean isAdmin = isRouaAdmin || "Admin".equals(role);
-                            
+
                             if (isAdmin || (isVerified != null && isVerified)) {
                                 String finalRole = isAdmin ? "Admin" : (role != null ? role : "Touriste");
                                 if (isRouaAdmin) {
